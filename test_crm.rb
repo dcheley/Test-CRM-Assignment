@@ -1,12 +1,14 @@
+require_relative 'test_contact'
+
 class CRM
 
-  require_relative 'contact'
-
-  def initialize
+  def initialize(name)
+    @name = name
+    print_main_menu
   end
 
   def main_menu
-    while true #repeat indefinitely
+    if true #repeat indefinitely
       print_main_menu
       user_selected = gets.to_i
       call_option(user_selected)
@@ -20,7 +22,7 @@ class CRM
     puts '[4] Display all contacts'
     puts '[5] Search by attribute'
     puts '[6] Exit'
-    print 'Enter a number:'
+    print 'Enter a number: '
   end
 
   def call_option(user_selected)
@@ -35,19 +37,20 @@ class CRM
   end
 
   def add_new_contact
-    print 'Enter First Name:'
+    print 'Enter First Name: '
     first_name = gets.chomp
-    print 'Enter Last Name:'
+    print 'Enter Last Name: '
     last_name = gets.chomp
-    print 'Enter Email Address:'
+    print 'Enter Email Address: '
     email = gets.chomp
-    print 'Enter a Note:'
-    email = gets.chomp
+    print 'Enter a Note: '
+    note = gets.chomp
     Contact.create(first_name, last_name, email, note)
+    print_main_menu
   end
 
   def modify_existing_contact
-    print 'Enter contact id #'
+    print 'Enter contact id #: '
     contact_id = gets.chomp
     modified_contact = Contact.find(contact_id)
       if modified_contact
@@ -57,21 +60,43 @@ class CRM
         puts "3. Email Address"
         puts "4. Note"
         input = gets.chomp
+        ma = modified_attribute(input)
+        puts "Please enter new info"
+        change = gets.chomp
+        modified_contact.update(ma, change)
+        print_main_menu
       else
         puts "Contact doesn't exist"
         print_main_menu
       end
   end
 
+  def modified_attribute(input)
+    if input == "1"
+      "first_name"
+    elsif input == "2"
+      "last_name"
+    elsif input == "3"
+      "email"
+    elsif input == "4"
+      "note"
+    else
+      puts "Command doesn't exist, returning to Main Menu"
+      print_main_menu
+    end
+  end
+
   def delete_contact
-    print 'Enter contact id # to delete selected contact'
+    print 'Enter contact id # to delete selected contact: '
     id = gets.chomp
-    contact = Contact.find(id)
+    deleted_contact = Contact.find(id)
     puts "Are you sure you want to delete #{self.first_name} #{self.last_name}?"
     print 'Type "y" to confirm or "n" to cancel'
     confirm = gets.chomp
       if confirm == "y"
-        contact.delete(id)
+        deleted_contact.delete
+        puts "Contact deleted!"
+        print_main_menu
       else
         puts "Action Cancelled"
         print_main_menu
@@ -86,24 +111,26 @@ class CRM
   end
 
   def display_all_contacts
-    Contact.all
+    Contact.all.each do |contact|
+    end
+    print_main_menu
     # HINT: Make use of the display_contacts method to keep your code DRY
   end
 
   def search_by_attribute
-    print 'Please input one of the following pieces of information to search by:'
-    print 'First Name, Last Name, Email or Note'
+    print 'Enter one of the following pieces of info to search by: '
+    print 'first_name, last_name, email or note'
     attribute = gets.chomp
-    contacts = Contact.find_by(attribute)
-      if contacts
-        print "#{contacts.first_name}, #{contacts.last_name}, #{contacts.email}, #{contacts.note}"
+    print 'Enter filter for selected info: '
+    filter = gets.chomp
+    searched_contact = Contact.find_by(attribute, filter)
+      if searched_contact
+        print "#{self.first_name}, #{self.last_name}, #{self.email}, #{self.note}"
       else
         puts "Contact doesn't exist"
       end
       print_main_menu
     # HINT: Make use of the display_contacts method to keep your code DRY
   end
-
   # Add other methods here, if you need them.
-
 end

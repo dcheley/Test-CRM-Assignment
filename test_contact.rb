@@ -13,15 +13,14 @@ attr_accessor :first_name, :last_name, :email, :note
     @note = note
     @id = @@id
     @@id += 1
-    @@contacts << self #puts contact list into array as Class variable
   end
 
   # This method should call the initializer,
   # store the newly created contact, and then return it
   def self.create(first_name, last_name, email, note = "N/A")
     new_contact = Contact.new(first_name, last_name, email, note)
-    @@contacts << new_contact
-    return new_contact
+    @@contacts << new_contact #puts contact list into array as Class variable
+    new_contact
   end
 
   # This method should return all of the existing contacts
@@ -32,28 +31,51 @@ attr_accessor :first_name, :last_name, :email, :note
   # This method should accept an id as an argument
   # and return the contact who has that id
   def self.find(id)
-   @@contacts.each {|contact|
-    if contact.id == id
-      return contact    #if no return, returns previous line of code/statement
-    end
-    }
-    "Contact doesn't exist"
+   @@contacts.find do |contact|
+     contact.id == id.to_i
+     end
+  end
+
+  def self.find_first_name(first_name)
+   @@contacts.find do |contact|
+     contact.first_name == first_name
+     end
+  end
+
+  def self.find_last_name(last_name)
+   @@contacts.find do |contact|
+     contact.last_name == last_name
+     end
+  end
+
+  def self.find_email(email)
+   @@contacts.find do |contact|
+     contact.email == email
+     end
+  end
+
+  def self.find_note(note)
+   @@contacts.find do |contact|
+     contact.note == note
+     end
   end
   # This method should allow you to specify
   # 1. which of the contact's attributes you want to update
   # 2. the new value for that attribute
   # and then make the appropriate change to the contact
-  def update(attribute, new_attribute)
-    if attribute == self.first_name
-       self.first_name == new_attribute
-    elsif attribute == self.last_name
-       self.last_name == new_attribute
-    elsif attribute == self.email
-       self.email == new_attribute
-    elsif attribute == self.note
-       self.note == new_attribute
+  def update(attribute, new_value)
+    attribute = attribute.to_sym
+    case attribute
+    when :first_name
+      self.first_name = new_value
+    when :last_name
+      self.last_name = new_value
+    when :email
+      self.email = new_value
+    when :note
+      self.note = new_value
     else
-       puts "Update failed; Contact doesn't exist"
+      puts "Update failed; Contact doesn't exist"
     end
   end
 
@@ -61,16 +83,18 @@ attr_accessor :first_name, :last_name, :email, :note
   # but it should allow you to search for a contact using attributes other than id
   # by specifying both the name of the attribute and the value
   # eg. searching for 'first_name', 'Betty' should return the first contact named Betty
-  def self.find_by(show)
-   @@contacts.each do |contact|
-    if contact.first_name == show
-      return contact
-    elsif contact.last_name == show
-      return contact
-    elsif contact.email == show
-      return contact
+  def self.find_by(attribute, filter)
+    case attribute
+    when "first_name"
+      find_first_name(filter)
+    when "last_name"
+      find_last_name(filter)
+    when "email"
+      find_email(filter)
+    when "note"
+      find_note(filter)
     else
-      puts "Contact doesn't exist"
+      puts "Search failed; Contact doesn't exist"
     end
   end
   # This method should delete all of the contacts
@@ -79,7 +103,7 @@ attr_accessor :first_name, :last_name, :email, :note
   end
 
   def full_name
-    "#{first_name}, #{last_name}"
+    "#{first_name} #{last_name}"
   end
 
   # This method should delete the contact
@@ -87,5 +111,4 @@ attr_accessor :first_name, :last_name, :email, :note
   def delete
     @@contacts.delete(self)
   end
-
 end
